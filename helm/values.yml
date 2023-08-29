@@ -1,0 +1,9 @@
+image:
+  repository: myapp-image
+  tag: latest
+
+replicaCount: 3
+
+author: "John Doe"
+
+#helm install myapp-chart . -f values.yaml

@@ -1,0 +1,38 @@
+---
+- name: Configure host
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Create cloudru user
+      user:
+        name: cloudru
+        password: "{{ 'cloudpass' | password_hash('sha512') }}"
+        createhome: true
+
+    - name: Allow SSH key authentication for cloudru user
+      authorized_key:
+        user: cloudru
+        state: present
+        key: "{{ lookup('file', '/home/lyudamila/.ssh/key/id_rsa.pub') }}"
+
+    - name: Disable SSH login for root
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regex: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        backup: yes
+      notify:
+        - restart sshd
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+
+
+        #команда для запуска ansible-playbool config.yml
+        #Публичный ключ для публикации на хост:
+
+#ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCfrfE0OluoNHb5dOpV4RpWmVXvMBWc17kaM7DDjCm7romNQMDX95i5Fc67Q3c47pvrm/qi/
